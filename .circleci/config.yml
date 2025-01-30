@@ -1,0 +1,21 @@
+version: 2.1
+
+jobs:
+  build_image:
+    docker:
+      - image: cimg/go:1.22
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          name: Build the Docker image
+          command: |
+            docker build -t cugureanu/go-app-cicd:latest .
+            echo $DOCKER_PASSWORD | docker login -u cugureanu --password-stdin
+            docker push cugureanu/go-app-cicd:latest
+
+workflows:
+  build_app:
+    jobs:
+      - build_image
