@@ -27,9 +27,9 @@ func NewMux() *Mux {
 func (m *Mux) ListUsers(w http.ResponseWriter, r *http.Request) {
 	users := []types.User{
 		{
-			Name:  "Kiril",
-			Email: "kiril@test.com",
-			Age:   20,
+			Name:  "Kirill",
+			Email: "kirill@test.com",
+			Age:   19,
 		},
 	}
 	log.Default().Println("users", users)
