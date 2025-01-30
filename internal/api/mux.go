@@ -3,8 +3,9 @@ package api
 import (
 	"encoding/json"
 	"log"
-	"my-api/internal/types"
 	"net/http"
+
+	"github.com/Kirusha05/go-api-cicd/internal/types"
 
 	"github.com/gorilla/mux"
 )

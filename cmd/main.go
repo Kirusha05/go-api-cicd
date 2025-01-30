@@ -3,16 +3,17 @@ package main
 import (
 	"context"
 	"log"
-	"my-api/internal/api"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/Kirusha05/go-api-cicd/internal/api"
 )
 
 var (
-	address string = ":80"
+	address string = ":8080"
 )
 
 func main() {

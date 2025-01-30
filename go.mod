@@ -1,5 +1,5 @@
-module my-api
+module github.com/Kirusha05/go-api-cicd
 
 go 1.23.5
 
-require github.com/gorilla/mux v1.8.1 // indirect
+require github.com/gorilla/mux v1.8.1
