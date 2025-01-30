@@ -1,22 +1,23 @@
 package api
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
-	"github.com/Kirusha05/go-api-cicd/internal/types"
+	"github.com/Kirusha05/go-api-cicd/internal/utils"
 
 	"github.com/gorilla/mux"
 )
 
 type Mux struct {
 	*mux.Router
+	userService *UserService
 }
 
 func NewMux() *Mux {
 	newMux := Mux{
-		Router: mux.NewRouter(),
+		Router:      mux.NewRouter(),
+		userService: NewUserService(),
 	}
 
 	newMux.HandleFunc("/", newMux.ListUsers).Methods("GET")
@@ -25,15 +26,11 @@ func NewMux() *Mux {
 }
 
 func (m *Mux) ListUsers(w http.ResponseWriter, r *http.Request) {
-	users := []types.User{
-		{
-			Name:  "Kirill",
-			Email: "kirill@test.com",
-			Age:   19,
-		},
+	users, err := m.userService.GetUsers()
+	if err != nil {
+		utils.WriteJSONError(w, http.StatusInternalServerError, "Could not get users")
 	}
-	log.Default().Println("users", users)
 
-	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(users)
+	log.Default().Println("users", users)
+	utils.WriteJSONResponse(w, http.StatusOK, users)
 }
