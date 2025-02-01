@@ -1,21 +1,38 @@
 version: 2.1
 
 jobs:
-  build_image:
+  test:
     docker:
       - image: cimg/go:1.22
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          command: |
+            go mod download
+            go test ./...
+  build-and-push:
+    docker:
+      - image: cimg/base:2025.01
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: false
       - run:
-          name: Build the Docker image
+          name: Build the Docker image and push it to DockerHub
           command: |
             docker build -t cugureanu/go-app-cicd:latest .
             echo $DOCKER_PASSWORD | docker login -u cugureanu --password-stdin
             docker push cugureanu/go-app-cicd:latest
 
 workflows:
-  build_app:
+  deployment-workflow:
     jobs:
-      - build_image
+      - test
+      - build-and-push:
+          requires:
+            - test
+          filters:
+            branches:
+              only: main
+
