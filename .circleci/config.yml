@@ -25,7 +25,7 @@ jobs:
             docker build -t cugureanu/go-app-cicd:latest .
             echo $DOCKER_PASSWORD | docker login -u cugureanu --password-stdin
             docker push cugureanu/go-app-cicd:latest
-            
+
   build-push-ecr:
     docker:
       - image: cimg/base:2025.01
@@ -33,9 +33,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: false
-      - run:
-          name: Check if AWS CLI exists
-          command: aws --version
       - run:
           name: "Install AWS CLI"
           command: |
