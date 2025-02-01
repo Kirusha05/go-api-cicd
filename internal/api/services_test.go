@@ -19,7 +19,7 @@ func TestGetUsers(t *testing.T) {
 		tests := []testCase{
 			{
 				expected: []types.User{
-					{Name: "Kiril", Email: "kiril@test.com", Age: 20},
+					{Name: "Kirul", Email: "kiril@test.com", Age: 20},
 				},
 			},
 		}
