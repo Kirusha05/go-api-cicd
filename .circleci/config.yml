@@ -11,6 +11,14 @@ jobs:
           command: |
             go mod download
             go test ./...
+  post-test:
+    docker:
+      - image: cimg/base:2025.01
+    steps:
+      - checkout
+      - run:
+          name: Post tests commands
+          command: echo "Tests ran successfully!"
   build-and-push:
     docker:
       - image: cimg/base:2025.01
@@ -29,9 +37,12 @@ workflows:
   deployment-workflow:
     jobs:
       - test
-      - build-and-push:
+      - post-test:
           requires:
             - test
+      - build-and-push:
+          requires:
+            - post-test
           filters:
             branches:
               only: main
