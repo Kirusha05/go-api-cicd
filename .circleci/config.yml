@@ -11,14 +11,7 @@ jobs:
           command: |
             go mod download
             go test ./...
-  post-test:
-    docker:
-      - image: cimg/base:2025.01
-    steps:
-      - checkout
-      - run:
-          name: Post tests commands
-          command: echo "Tests ran successfully!"
+
   build-and-push:
     docker:
       - image: cimg/base:2025.01
@@ -32,17 +25,48 @@ jobs:
             docker build -t cugureanu/go-app-cicd:latest .
             echo $DOCKER_PASSWORD | docker login -u cugureanu --password-stdin
             docker push cugureanu/go-app-cicd:latest
+            
+  build-push-ecr:
+    docker:
+      - image: cimg/base:2025.01
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          name: Check if AWS CLI exists
+          command: aws --version
+      - run:
+          name: "Install AWS CLI"
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            pwd
+            ls
+            unzip awscliv2.zip
+            sudo ./aws/install
+            aws --version
+      - run:
+          name: "AWS CLI Login"
+          command: |
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws configure set region $AWS_REGION
+
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 339713009960.dkr.ecr.eu-central-1.amazonaws.com
+      - run:
+          name: "Build and push image to ECR"
+          command: |
+            docker build -t go-api:latest .
+            docker tag go-api:latest 339713009960.dkr.ecr.eu-central-1.amazonaws.com/testing/circleci-go-api:latest
+            docker push 339713009960.dkr.ecr.eu-central-1.amazonaws.com/testing/circleci-go-api:latest
 
 workflows:
   deployment-workflow:
     jobs:
       - test
-      - post-test:
+      - build-push-ecr:
           requires:
             - test
-      - build-and-push:
-          requires:
-            - post-test
           filters:
             branches:
               only: main
